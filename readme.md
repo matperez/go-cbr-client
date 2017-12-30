@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-    rate, err := cbr.GetCurrencyRate("USD", time.Time)
+    rate, err := cbr.GetCurrencyRate("USD", time.Now())
     if err != nil {
         panic(err)
     }
