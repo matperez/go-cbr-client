@@ -1,6 +1,6 @@
-# Получение курсов валют с сайта [ЦБРФ](http://www.cbr.ru/scripts/Root.asp?PrtId=SXML)
+# Central bank of the Russian Federation currency rates client [CBRF](http://www.cbr.ru/scripts/Root.asp?PrtId=SXML)
 
-## Пример использования
+## Usage example
 
 ```golang
 package main
