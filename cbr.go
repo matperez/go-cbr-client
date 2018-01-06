@@ -7,13 +7,15 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	"golang.org/x/text/encoding/charmap"
 )
+
+const dateFormat = "02/01/2006"
+const baseURL = "http://www.cbr.ru/scripts/XML_daily.asp"
 
 // Currency is a currency item
 type Currency struct {
@@ -32,14 +34,10 @@ type Result struct {
 	Currencies []Currency `xml:"Valute"`
 }
 
-const baseURL = "http://www.cbr.ru/scripts/XML_daily.asp"
-const dateFormat = "02/01/2006"
-
-//GetCurrencyRate returns currency rate at a specific time
-func GetCurrencyRate(currency string, t time.Time) (float64, error) {
+func getCurrencyRate(currency string, t time.Time, fetch FetchFunction) (float64, error) {
 	log.Printf("Fetching the currency rate for %s at %v\n", currency, t.Format("02.01.2006"))
 	var result Result
-	err := GetCurrencies(&result, t)
+	err := getCurrencies(&result, t, fetch)
 	if err != nil {
 		return 0, err
 	}
@@ -60,10 +58,9 @@ func getCurrencyRateValue(v Currency) (float64, error) {
 	return floatValue / float64(v.Nom), nil
 }
 
-// GetCurrencies returns plain server response at a specific date
-func GetCurrencies(v *Result, t time.Time) error {
+func getCurrencies(v *Result, t time.Time, fetch FetchFunction) error {
 	url := baseURL + "?date_req=" + t.Format(dateFormat)
-	resp, err := http.Get(url)
+	resp, err := fetch(url)
 	if err != nil {
 		return err
 	}
