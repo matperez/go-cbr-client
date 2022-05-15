@@ -1,5 +1,0 @@
-package: github.com/matperez/go-cbr-client
-import:
-- package: golang.org/x/text
-  subpackages:
-  - encoding/charmap
