@@ -1,5 +1,6 @@
 # Golang client for the Central Bank of the Russian Federation currency rates API
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/ivanglie/go-cbr-client.svg)](https://pkg.go.dev/github.com/ivanglie/go-cbr-client)
 [![Test](https://github.com/ivanglie/go-cbr-client/actions/workflows/test.yml/badge.svg)](https://github.com/ivanglie/go-cbr-client/actions/workflows/test.yml)
 
 go-cbr-client is a fork of [matperez's](https://github.com/matperez) [client](https://github.com/matperez/go-cbr-client) for [CBRF API](http://www.cbr.ru/development/).
