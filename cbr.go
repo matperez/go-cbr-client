@@ -15,7 +15,7 @@ import (
 )
 
 const dateFormat = "02/01/2006"
-const baseURL = "http://www.cbr.ru/scripts/XML_daily.asp"
+const baseURL = "http://www.cbr.ru/scripts/XML_daily_eng.asp"
 
 // Currency is a currency item
 type Currency struct {

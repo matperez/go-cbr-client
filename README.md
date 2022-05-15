@@ -1,22 +1,38 @@
-# Central bank of the Russian Federation currency rates client [CBRF](http://www.cbr.ru/scripts/Root.asp?PrtId=SXML)
+# Golang client for the Central Bank of the Russian Federation currency rates API
 
-## Usage example
+[![Test](https://github.com/ivanglie/go-cbr-client/actions/workflows/test.yml/badge.svg)](https://github.com/ivanglie/go-cbr-client/actions/workflows/test.yml)
+
+go-cbr-client is a fork of [matperez's](https://github.com/matperez) [client](https://github.com/matperez/go-cbr-client) for [CBRF API](http://www.cbr.ru/development/).
+
+## Example
+
+First, ensure the library is installed and up to date by running go get -u github.com/ivanglie/go-cbr-client/v2.
+
+This is a very simple app that just displays exhange rate of US dollar.
 
 ```golang
 package main
 
 import (
-    cbr "github.com/matperez/go-cbr-client"
-    "time"
-    "fmt"
+	"fmt"
+	"time"
+
+	cbr "github.com/ivanglie/go-cbr-client/v2"
 )
 
 func main() {
-    client := cbr.NewClient()
-    rate, err := client.GetRate("USD", time.Now())
-    if err != nil {
-        panic(err)
-    }
-    fmt.Prinln(rate)
+	client := cbr.NewClient()
+	rate, err := client.GetRate("USD", time.Now())
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(rate)
 }
 ```
+
+## References
+
+For more information check out the following links:
+
+* [CBRF API](http://www.cbr.ru/development/SXML/)
+* [CBRF technical resources](http://www.cbr.ru/eng/development/) (ENG)
