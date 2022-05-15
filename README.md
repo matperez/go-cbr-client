@@ -6,7 +6,7 @@ go-cbr-client is a fork of [matperez's](https://github.com/matperez) [client](ht
 
 ## Example
 
-First, ensure the library is installed and up to date by running go get -u github.com/ivanglie/go-cbr-client/v2.
+First, ensure the library is installed and up to date by running go get -u github.com/ivanglie/go-cbr-client.
 
 This is a very simple app that just displays exhange rate of US dollar.
 
@@ -17,7 +17,7 @@ import (
 	"fmt"
 	"time"
 
-	cbr "github.com/ivanglie/go-cbr-client/v2"
+	cbr "github.com/ivanglie/go-cbr-client"
 )
 
 func main() {
