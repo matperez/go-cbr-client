@@ -34,8 +34,9 @@ type Result struct {
 	Currencies []Currency `xml:"Valute"`
 }
 
-func getCurrencyRate(currency string, t time.Time, fetch FetchFunction) (float64, error) {
+func getRate(currency string, t time.Time, fetch FetchFunction) (float64, error) {
 	log.Printf("Fetching the currency rate for %s at %v\n", currency, t.Format("02.01.2006"))
+
 	var result Result
 	err := getCurrencies(&result, t, fetch)
 	if err != nil {
@@ -49,13 +50,14 @@ func getCurrencyRate(currency string, t time.Time, fetch FetchFunction) (float64
 	return 0, fmt.Errorf("Unknown currency: %s", currency)
 }
 
-func getCurrencyRateValue(v Currency) (float64, error) {
-	properFormattedValue := strings.Replace(v.Value, ",", ".", -1)
-	floatValue, err := strconv.ParseFloat(properFormattedValue, 64)
+func getCurrencyRateValue(cur Currency) (float64, error) {
+	var res float64 = 0
+	properFormattedValue := strings.Replace(cur.Value, ",", ".", -1)
+	res, err := strconv.ParseFloat(properFormattedValue, 64)
 	if err != nil {
-		return 0, err
+		return res, err
 	}
-	return floatValue / float64(v.Nom), nil
+	return res / float64(cur.Nom), nil
 }
 
 func getCurrencies(v *Result, t time.Time, fetch FetchFunction) error {

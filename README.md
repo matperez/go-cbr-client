@@ -30,6 +30,7 @@ func main() {
 	fmt.Println(rate)
 }
 ```
+See [main.go](./_example/main.go).
 
 ## References
 
