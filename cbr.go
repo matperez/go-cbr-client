@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -14,8 +13,14 @@ import (
 	"golang.org/x/text/encoding/charmap"
 )
 
-const dateFormat = "02/01/2006"
-const baseURL = "http://www.cbr.ru/scripts/XML_daily_eng.asp"
+const (
+	baseURL    = "http://www.cbr.ru/scripts/XML_daily_eng.asp"
+	dateFormat = "02/01/2006"
+)
+
+// Debug mode
+// If this variable is set to true, debug mode activated for the package
+var Debug = false
 
 // Currency is a currency item
 type Currency struct {
@@ -35,7 +40,9 @@ type Result struct {
 }
 
 func getRate(currency string, t time.Time, fetch FetchFunction) (float64, error) {
-	log.Printf("Fetching the currency rate for %s at %v\n", currency, t.Format("02.01.2006"))
+	if Debug {
+		log.Printf("Fetching the currency rate for %s at %v\n", currency, t.Format("02.01.2006"))
+	}
 
 	var result Result
 	err := getCurrencies(&result, t, fetch)
