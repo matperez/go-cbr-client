@@ -3,6 +3,7 @@ package cbr
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -39,7 +40,7 @@ type Result struct {
 	Currencies []Currency `xml:"Valute"`
 }
 
-func getRate(currency string, t time.Time, fetch FetchFunction) (float64, error) {
+func getRate(currency string, t time.Time, fetch fetchFunction) (float64, error) {
 	if Debug {
 		log.Printf("Fetching the currency rate for %s at %v\n", currency, t.Format("02.01.2006"))
 	}
@@ -67,8 +68,11 @@ func getCurrencyRateValue(cur Currency) (float64, error) {
 	return res / float64(cur.Nom), nil
 }
 
-func getCurrencies(v *Result, t time.Time, fetch FetchFunction) error {
+func getCurrencies(v *Result, t time.Time, fetch fetchFunction) error {
 	url := baseURL + "?date_req=" + t.Format(dateFormat)
+	if fetch == nil {
+		return errors.New("fetch is empty")
+	}
 	resp, err := fetch(url)
 	if err != nil {
 		return err
@@ -77,6 +81,7 @@ func getCurrencies(v *Result, t time.Time, fetch FetchFunction) error {
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	decoder := xml.NewDecoder(bytes.NewReader(body))
 	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
