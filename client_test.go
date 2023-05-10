@@ -1,8 +1,6 @@
 package cbr
 
 import (
-	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
@@ -21,10 +19,4 @@ func TestGetRate_Error(t *testing.T) {
 	rate, err := client.GetRate(" ", time.Now())
 	assert.Error(t, err)
 	assert.Equal(t, float64(0), rate)
-}
-
-func TestSetFetchFunction(t *testing.T) {
-	c := client{nil}
-	c.SetFetchFunction(func(url string) (resp *http.Response, err error) { return http.Get(url) })
-	assert.Equal(t, reflect.Func, reflect.TypeOf(c.fetch).Kind())
 }

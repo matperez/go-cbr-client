@@ -9,24 +9,24 @@ import (
 
 func Test_Debug(t *testing.T) {
 	Debug = true
-	getRate("CNY", time.Now(), nil)
+	rate("CNY", time.Now())
 	assert.True(t, Debug)
 
 	Debug = false
-	getRate("CNY", time.Now(), nil)
+	rate("CNY", time.Now())
 	assert.False(t, Debug)
 }
 
-func Test_getRate_Error(t *testing.T) {
-	rate, err := getRate("CNY", time.Now(), nil)
+func Test_rate_Error(t *testing.T) {
+	rate, err := rate("", time.Now())
 	assert.NotNil(t, err)
 	assert.Equal(t, float64(0), rate)
 }
 
-func Test_getCurrencyRateValue_Error(t *testing.T) {
+func Test_currencyRateValue_Error(t *testing.T) {
 	c := Currency{}
 	c.Value = "0'1"
-	rate, err := getCurrencyRateValue(c)
+	rate, err := currencyRateValue(c)
 	assert.NotNil(t, err)
 	assert.Equal(t, float64(0), rate)
 }

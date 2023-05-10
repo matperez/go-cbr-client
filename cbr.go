@@ -3,10 +3,9 @@ package cbr
 import (
 	"bytes"
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -19,11 +18,11 @@ const (
 	dateFormat = "02/01/2006"
 )
 
-// Debug mode
-// If this variable is set to true, debug mode activated for the package
+// Debug mode.
+// If this variable is set to true, debug mode activated for the package.
 var Debug = false
 
-// Currency is a currency item
+// Currency is a currency item.
 type Currency struct {
 	ID       string `xml:"ID,attr"`
 	NumCode  uint   `xml:"NumCode"`
@@ -33,55 +32,68 @@ type Currency struct {
 	Value    string `xml:"Value"`
 }
 
-// Result is a result representation
+// Result is a result representation.
 type Result struct {
 	XMLName    xml.Name   `xml:"ValCurs"`
 	Date       string     `xml:"Date,attr"`
 	Currencies []Currency `xml:"Valute"`
 }
 
-func getRate(currency string, t time.Time, fetch fetchFunction) (float64, error) {
+func rate(currency string, t time.Time) (float64, error) {
 	if Debug {
 		log.Printf("Fetching the currency rate for %s at %v\n", currency, t.Format("02.01.2006"))
 	}
 
 	var result Result
-	err := getCurrencies(&result, t, fetch)
-	if err != nil {
+	if err := currencies(&result, t); err != nil {
 		return 0, err
 	}
+
 	for _, v := range result.Currencies {
 		if v.CharCode == currency {
-			return getCurrencyRateValue(v)
+			return currencyRateValue(v)
 		}
 	}
-	return 0, fmt.Errorf("Unknown currency: %s", currency)
+
+	return 0, fmt.Errorf("unknown currency: %s", currency)
 }
 
-func getCurrencyRateValue(cur Currency) (float64, error) {
+func currencyRateValue(cur Currency) (float64, error) {
 	var res float64 = 0
 	properFormattedValue := strings.Replace(cur.Value, ",", ".", -1)
 	res, err := strconv.ParseFloat(properFormattedValue, 64)
 	if err != nil {
 		return res, err
 	}
+
 	return res / float64(cur.Nom), nil
 }
 
-func getCurrencies(v *Result, t time.Time, fetch fetchFunction) error {
+func currencies(v *Result, t time.Time) error {
 	url := baseURL + "?date_req=" + t.Format(dateFormat)
-	if fetch == nil {
-		return errors.New("fetch is empty")
-	}
-	resp, err := fetch(url)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+
+	req.Header.Set("User-Agent", randomUserAgent())
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("status code: %d", resp.StatusCode)
+	}
 
 	decoder := xml.NewDecoder(bytes.NewReader(body))
 	decoder.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
@@ -89,9 +101,10 @@ func getCurrencies(v *Result, t time.Time, fetch fetchFunction) error {
 		case "windows-1251":
 			return charmap.Windows1251.NewDecoder().Reader(input), nil
 		default:
-			return nil, fmt.Errorf("Unknown charset: %s", charset)
+			return nil, fmt.Errorf("unknown charset: %s", charset)
 		}
 	}
+
 	err = decoder.Decode(&v)
 	if err != nil {
 		return err
